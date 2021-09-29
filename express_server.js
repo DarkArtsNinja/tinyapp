@@ -7,6 +7,14 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+function generateRandomString() {
+  
+  //generate a 6 alpha numeric character
+let newShortURL = Math.random().toString(36).substr(2, 6)
+return newShortURL;
+}
+
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -18,14 +26,21 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  // console.log(req.body);  // Log the POST request body to the console
+  let tempShortURL = generateRandomString();
+  urlDatabase[tempShortURL] = req.body.longURL
+  res.redirect("/u/" + tempShortURL);         // Respond with 'Ok' (we will replace this)
+  // console.log(urlDatabase);
 });
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
 
 app.get("/urls/:shortURL", (req, res) =>{
   const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
