@@ -14,12 +14,11 @@ let newShortURL = Math.random().toString(36).substr(2, 6)
 return newShortURL;
 }
 
-
-
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -32,6 +31,13 @@ app.post("/urls", (req, res) => {
   res.redirect("/u/" + tempShortURL);         // Respond with 'Ok' (we will replace this)
   // console.log(urlDatabase);
 });
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");         // Respond with 'Ok' (we will replace this)
+  // console.log(urlDatabase);
+});
+
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
