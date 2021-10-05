@@ -1,16 +1,20 @@
 const express = require("express")
 const cookieParser = require("cookie-parser")
-
 const app  = express()
 const PORT = 8080;
-
 app.set("view engine", "ejs");
+//***********************************************************************
 
 const bodyParser = require("body-parser");
 const { render } = require("ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(cookieParser())
+//***********************************************************************
+const bcrypt = require('bcryptjs'); //secure password
+//***********************************************************************
+
+
 
 function generateRandomString() {
   //generate a 6 alpha numeric character
@@ -18,18 +22,16 @@ let newShortURL = Math.random().toString(36).substr(2, 6)
 return newShortURL;
 }
 
-
-
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
  "user2RandomID": {
    id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
 
@@ -55,7 +57,7 @@ const urlDatabase = {
   let userSpecificURLDatabase = {};
 
 function urlsForUser(userIDFromCookie){
-  // userSpecificURLDatabase = {};
+  userSpecificURLDatabase = {};
 
   for (const shortURL in urlDatabase) {
     // console.log(urlDatabase[url]["userID"]);
@@ -227,12 +229,19 @@ app.post("/register", (req, res) => {
 
   let newID = generateRandomString();
 
+
+  // const password = "purple-monkey-dinosaur"; // found in the req.params object
+  
+  
+  
   //saving the newly registered user into the user database
   users[newID] =   {
     id : newID,
     email : req.body.email, 
-    password : req.body.password
+    password : bcrypt.hashSync(req.body.password, 10)   
   }
+
+  console.log(users[newID]["password"])
 
   res.cookie("user_id", newID);
   res.redirect("/urls");
@@ -251,6 +260,8 @@ app.post("/login", (req, res) =>{
   const submittedEmail = req.body.email;
   const submittedPassword = req.body.password;
 
+
+
   console.log(submittedEmail + "<< this is email from the form");
   console.log(submittedPassword + "<< this is password from the form");
 //  user2@example.com
@@ -262,8 +273,10 @@ app.post("/login", (req, res) =>{
 
   let desiredUser = {};
 
+  // console.log(users[user]['password']);
+
   for (const user in users) {
-    foundUser = users[user]['email'] === submittedEmail && users[user]['password'] === submittedPassword;
+    foundUser = users[user]['email'] === submittedEmail && bcrypt.compareSync(submittedPassword, users[user]['password']);
     if(foundUser){
       desiredUser = user;
       break;
