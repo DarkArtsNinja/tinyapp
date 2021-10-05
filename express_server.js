@@ -132,23 +132,9 @@ app.post("/login", (req, res) =>{
 
   let foundUser = false;
 
-  // for(const user in users) {
-  //   foundUser = users[user]['email'] === submittedEmail && users[user]['password'] === submittedPassword;
-  //   if(foundUser){
-  //     break;
-  //   }
-  // };
-  
-  // if(foundUser){
-  //   res.redirect('/login')
-  // }else{
-  //   //show the erorr
-  // }
-
   let desiredUser = {};
 
   for (const user in users) {
-    // console.log(users[user]);
     foundUser = users[user]['email'] === submittedEmail && users[user]['password'] === submittedPassword;
     if(foundUser){
       desiredUser = user;
